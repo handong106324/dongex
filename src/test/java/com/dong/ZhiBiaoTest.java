@@ -9,9 +9,12 @@ import com.exchange.OkExchange;
 import com.huobi.response.Kline;
 import com.huobi.response.Symbol;
 import d.trade.duichong.DuiChongThread;
+import zhibiao.base.MACD.HistoryPrice;
 import zhibiao.base.kdj.KDJ;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.List;
 
 public class ZhiBiaoTest {
@@ -33,7 +36,8 @@ public class ZhiBiaoTest {
          */
         List<Kline> ticker = bigOneClient.klines(symbolPair,"60min", "2000");
 
-        System.out.println(ticker);
+        KDJ kdj = new KDJ();
+        kdj.computeStockKDJ(ticker);
 
     }
 

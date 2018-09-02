@@ -1,48 +1,48 @@
 package zhibiao.base.kdj;
 
 
-import zhibiao.base.MACD.HistoryPrice;
+import com.huobi.response.Kline;
 
 import java.math.BigDecimal;
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.List;
 
 /**
  * Created by Luonanqin on 4/19/15.
  */
 public class KDJ {
 
-	private float RSV = 0;
+	private double RSV = 0;
 
-	private float lastK = 0;
-	private float lastD = 0;
+	private double lastK = 0;
+	private double lastD = 0;
 
-	private float minPrice = Integer.MAX_VALUE;
-	private float maxPrice = Integer.MIN_VALUE;
+	private Double minPrice = Double.MAX_VALUE;
+	private Double maxPrice = Double.MIN_VALUE;
 
-	private Deque<Float> nineDayMin = new ArrayDeque<Float>(9);
-	private Deque<Float> nineDayMax = new ArrayDeque<Float>(9);
+	private Deque<Double> nineDayMin = new ArrayDeque<Double>(9);
+	private Deque<Double> nineDayMax = new ArrayDeque<Double>(9);
 
-	public Deque<KdjData> computeStockKDJ(Deque<HistoryPrice> historyPrices) {
+	public Deque<KdjData> computeStockKDJ(List<Kline> historyPrices) {
 		Deque<KdjData> kdjs = new ArrayDeque<KdjData>();
 		boolean first = true;
-		for (HistoryPrice hPrice : historyPrices) {
-			String date = hPrice.getDate();
-			float price = Float.valueOf(hPrice.getPrice());
-			float min = Float.valueOf(hPrice.getMinPrice());
-			float max = Float.valueOf(hPrice.getMaxPrice());
+		for (Kline hPrice : historyPrices) {
+			double price = hPrice.getClose();
+			double min = hPrice.getLow();
+			double max = hPrice.getHigh();
 
 			nineDayMax.add(max);
 			nineDayMin.add(min);
 			if (nineDayMin.size() > 9) {
-				Float removeMax = nineDayMax.removeFirst();
+				Double removeMax = nineDayMax.removeFirst();
 				if (removeMax == maxPrice) {
 					if (max >= removeMax) {
 						maxPrice = max;
 					} else {
 						// 遍历一次
-						maxPrice = Integer.MIN_VALUE;
-						for (Float nine : nineDayMax) {
+						maxPrice = Double.MIN_VALUE;
+						for (Double nine : nineDayMax) {
 							if (nine > maxPrice) {
 								maxPrice = nine;
 							}
@@ -53,14 +53,14 @@ public class KDJ {
 						maxPrice = max;
 					}
 				}
-				Float removeMin = nineDayMin.removeFirst();
+				Double removeMin = nineDayMin.removeFirst();
 				if (removeMin == minPrice) {
 					if (min <= removeMin) {
 						minPrice = min;
 					} else {
 						// 遍历一次
-						minPrice = Integer.MAX_VALUE;
-						for (Float nine : nineDayMin) {
+						minPrice = Double.MAX_VALUE;
+						for (Double nine : nineDayMin) {
 							if (nine < minPrice) {
 								minPrice = nine;
 							}
@@ -81,7 +81,6 @@ public class KDJ {
 			}
 
 			KdjData kdj = new KdjData();
-			kdj.setDate(date);
 			if (first) {
 				kdj.setK("0");
 				kdj.setD("0");
@@ -111,9 +110,9 @@ public class KDJ {
 				 */
 
 				RSV = (price - minPrice) / (maxPrice - minPrice) * 100;
-				float k = 2 * lastK / 3 + 1 * RSV / 3;
-				float d = 2 * lastD / 3 + 1 * k / 3;
-				float j = 3 * k - 2 * d;
+				Double k = 2 * lastK / 3 + 1 * RSV / 3;
+				Double d = 2 * lastD / 3 + 1 * k / 3;
+				Double j = 3 * k - 2 * d;
 
 				lastK = k;
 				lastD = d;

@@ -11,20 +11,6 @@ public class Kline {
 
     private int id;
     private double amount;
-    private int count;
-    private double open;
-    private int close;
-    private int low;
-    private int high;
-    private double vol;
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
 
     public double getAmount() {
         return amount;
@@ -34,11 +20,11 @@ public class Kline {
         this.amount = amount;
     }
 
-    public int getCount() {
+    public double getCount() {
         return count;
     }
 
-    public void setCount(int count) {
+    public void setCount(double count) {
         this.count = count;
     }
 
@@ -50,27 +36,27 @@ public class Kline {
         this.open = open;
     }
 
-    public int getClose() {
+    public double getClose() {
         return close;
     }
 
-    public void setClose(int close) {
+    public void setClose(double close) {
         this.close = close;
     }
 
-    public int getLow() {
+    public double getLow() {
         return low;
     }
 
-    public void setLow(int low) {
+    public void setLow(double low) {
         this.low = low;
     }
 
-    public int getHigh() {
+    public double getHigh() {
         return high;
     }
 
-    public void setHigh(int high) {
+    public void setHigh(double high) {
         this.high = high;
     }
 
@@ -81,4 +67,20 @@ public class Kline {
     public void setVol(double vol) {
         this.vol = vol;
     }
+
+    private double count;
+    private double open;
+    private double close;
+    private double low;
+    private double high;
+    private double vol;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
 }
