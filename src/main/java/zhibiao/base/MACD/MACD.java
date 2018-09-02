@@ -82,45 +82,6 @@ public class MACD {
 		return macds;
 	}
 
-	public Deque<HistoryPrice> getLastPrice(String stockCodeName) {
-		Deque<HistoryPrice> historyPrices = new ArrayDeque<HistoryPrice>();
-		String path = BASE_DATA_PATH + stockCodeName + File.separator;
-		File file = new File(path + HistorySpider.HISTORY_FILE);
-		if (!file.exists()) {
-			return historyPrices;
-		}
-		RandomAccessFile raf = null;
-		try {
-			raf = new RandomAccessFile(file, "r");
-			String str = null;
-			raf.readLine();
-			while ((str = raf.readLine()) != null) {
-				String[] split = str.split(",");
-
-				if (split != null) {
-					HistoryPrice hPrice = new HistoryPrice();
-					hPrice.setDate(split[0]);
-					hPrice.setPrice(split[2]);
-					hPrice.setStock(stockCodeName);
-
-					historyPrices.addFirst(hPrice);
-				}
-			}
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			if (raf != null) {
-				try {
-					raf.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-		return historyPrices;
-	}
 
 	public void recorder(Deque<MacdData> macds, String stockCodeName) {
 		String path = RECORD_PATH + stockCodeName + File.separator;
@@ -159,36 +120,6 @@ public class MACD {
 				}
 			}
 		}
-	}
-
-	public static void main(String[] args) {
-		MACD macd = new MACD();
-		for (String stockCodeName : Recorder.stockList) {
-			System.out.println(stockCodeName);
-			Deque<HistoryPrice> lastPrices = macd.getLastPrice(stockCodeName);
-			Deque<MacdData> macdDatas = macd.computeStockMACD(lastPrices);
-			macd.recorder(macdDatas, stockCodeName);
-		}
-
-		// float EMA12 = 18.94f * 11 / 13 + 20.83f * 2 / 13;
-		// System.out.println(EMA12);
-		//
-		// double EMA26 = 18.94 * 25 / 27 + 20.83 * 2 / 27;
-		// System.out.println(EMA26);
-		//
-		// double DIF = EMA12 - EMA26;
-		// System.out.println(DIF);
-		//
-		// double DEA = DIF * 2 / 10;
-		// System.out.println(DEA);
-		//
-		// double macd = 2 * (DIF - DEA);
-		// System.out.println(macd);
-		//
-		// BigDecimal bigDecimal = new BigDecimal(DIF);
-		// BigDecimal bigDecimal1 = bigDecimal.setScale(3, BigDecimal.ROUND_HALF_UP);
-		// System.out.println(bigDecimal1);
-
 	}
 
 }

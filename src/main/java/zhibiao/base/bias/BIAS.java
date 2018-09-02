@@ -1,8 +1,5 @@
 package zhibiao.base.bias;
 
-import stock.dzh.Recorder;
-import stock.sohu.HistorySpider;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -24,46 +21,6 @@ public class BIAS {
 	public BIAS(int biasCycle) {
 		this.biasCycle = biasCycle;
 		field += (biasCycle + "日乖离率");
-	}
-
-	public void recorder(Deque<BiasData> biasDatas, String stockName) {
-		String path = RECORD_PATH + stockName + File.separator;
-		File file = new File(path + "bias_" + biasCycle + ".csv");
-		if (!file.exists()) {
-			try {
-				file.createNewFile();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		RandomAccessFile raf = null;
-		try {
-			raf = new RandomAccessFile(file, "rw");
-			long length = raf.length();
-			if (length == 0) {
-				raf.write(field.getBytes(Recorder.charset));
-				raf.writeByte((byte) 0XA);
-			} else {
-				raf.skipBytes((int) length);
-			}
-			for (BiasData bias : biasDatas) {
-				raf.write(bias.toString().getBytes());
-				raf.writeByte((byte) 0XA);
-			}
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			if (raf != null) {
-				try {
-					raf.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-
 	}
 
 	public Deque<BiasData> computeBIAS(Deque<HistoryPrice> prices) {
@@ -97,41 +54,4 @@ public class BIAS {
 		return biases;
 	}
 
-	public Deque<HistoryPrice> getPriceInfo(String stockName) {
-		Deque<HistoryPrice> historyPrices = new ArrayDeque<HistoryPrice>();
-		String path = Recorder.BASE_PATH + stockName + File.separator;
-		File file = new File(path + HistorySpider.HISTORY_FILE);
-		if (!file.exists()) {
-			return historyPrices;
-		}
-		RandomAccessFile raf = null;
-		try {
-			raf = new RandomAccessFile(file, "r");
-			String str = null;
-			raf.readLine();
-			while ((str = raf.readLine()) != null) {
-				String[] split = str.split(",");
-
-				String date = split[0];
-				String priceStr = split[2];
-
-				if (split != null) {
-					historyPrices.addFirst(new HistoryPrice(date, Float.valueOf(priceStr)));
-				}
-			}
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			if (raf != null) {
-				try {
-					raf.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-		return historyPrices;
-	}
 }

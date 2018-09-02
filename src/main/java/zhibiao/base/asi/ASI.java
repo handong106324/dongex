@@ -19,55 +19,6 @@ public class ASI {
 	private static final int ASI_MA = 10;
 	private static String field = "日期,ASI,ASIT";
 
-	public static void main(String[] args) {
-		ASI asi = new ASI();
-		for (String stockName : Recorder.stockList) {
-			System.out.println(stockName);
-			Deque<HistoryPrice> prices = asi.getPriceInfo(stockName);
-			Deque<ASIData> asiDatas = asi.computeASI(prices);
-			asi.recorder(asiDatas, stockName);
-		}
-	}
-
-	public void recorder(Deque<ASIData> dmiDatas, String stockName) {
-		String path = RECORD_PATH + stockName + File.separator;
-		File file = new File(path + "asi.csv");
-		if (!file.exists()) {
-			try {
-				file.createNewFile();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		RandomAccessFile raf = null;
-		try {
-			raf = new RandomAccessFile(file, "rw");
-			long length = raf.length();
-			if (length == 0) {
-				raf.write(field.getBytes(Recorder.charset));
-				raf.writeByte((byte) 0XA);
-			} else {
-				raf.skipBytes((int) length);
-			}
-			for (ASIData bias : dmiDatas) {
-				raf.write(bias.toString().getBytes());
-				raf.writeByte((byte) 0XA);
-			}
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			if (raf != null) {
-				try {
-					raf.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-
-	}
 
 	public Deque<ASIData> computeASI(Deque<HistoryPrice> prices) {
 		Deque<ASIData> asiDatas = new ArrayDeque<ASIData>();
@@ -150,45 +101,5 @@ public class ASI {
 		return asiDatas;
 	}
 
-	public Deque<HistoryPrice> getPriceInfo(String stockName) {
-		Deque<HistoryPrice> historyPrices = new ArrayDeque<HistoryPrice>();
-		String path = Recorder.BASE_PATH + stockName + File.separator;
-		File file = new File(path + HistorySpider.HISTORY_FILE);
-		if (!file.exists()) {
-			return historyPrices;
-		}
-		RandomAccessFile raf = null;
-		try {
-			raf = new RandomAccessFile(file, "r");
-			String str = null;
-			raf.readLine();
-			while ((str = raf.readLine()) != null) {
-				String[] split = str.split(",");
 
-				String date = split[0];
-				String openStr = split[1];
-				String priceStr = split[2];
-				String minStr = split[5];
-				String maxStr = split[6];
-
-				if (split != null) {
-					historyPrices
-							.addFirst(new HistoryPrice(date, Float.valueOf(openStr), Float.valueOf(priceStr), Float.valueOf(maxStr), Float.valueOf(minStr)));
-				}
-			}
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			if (raf != null) {
-				try {
-					raf.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-		return historyPrices;
-	}
 }

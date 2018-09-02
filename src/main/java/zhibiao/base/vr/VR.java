@@ -1,8 +1,5 @@
 package zhibiao.base.vr;
 
-import stock.dzh.Recorder;
-import stock.sohu.HistorySpider;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -21,54 +18,7 @@ public class VR {
 
 	private static final long M1 = 26;
 
-	public static void main(String[] args) {
-		VR vr = new VR();
-		for (String stockName : Recorder.stockList) {
-			System.out.println(stockName);
-			Deque<HistoryPrice> prices = vr.getPriceInfo(stockName);
-			Deque<VRData> vrDatas = vr.computeVR(prices);
-			vr.recorder(vrDatas, stockName);
-		}
-	}
 
-	public void recorder(Deque<VRData> wrDatas, String stockName) {
-		String path = RECORD_PATH + stockName + File.separator;
-		File file = new File(path + "vr.csv");
-		if (!file.exists()) {
-			try {
-				file.createNewFile();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		RandomAccessFile raf = null;
-		try {
-			raf = new RandomAccessFile(file, "rw");
-			long length = raf.length();
-			if (length == 0) {
-				raf.write(FIELD.getBytes(Recorder.charset));
-				raf.writeByte((byte) 0XA);
-			} else {
-				raf.skipBytes((int) length);
-			}
-			for (VRData wr : wrDatas) {
-				raf.write(wr.toString().getBytes());
-				raf.writeByte((byte) 0XA);
-			}
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			if (raf != null) {
-				try {
-					raf.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-	}
 
 	public Deque<VRData> computeVR(Deque<HistoryPrice> prices) {
 		Deque<VRData> vrDatas = new ArrayDeque<VRData>();
@@ -123,42 +73,5 @@ public class VR {
 		return vrDatas;
 	}
 
-	public Deque<HistoryPrice> getPriceInfo(String stockName) {
-		Deque<HistoryPrice> historyPrices = new ArrayDeque<HistoryPrice>();
-		String path = Recorder.BASE_PATH + stockName + File.separator;
-		File file = new File(path + HistorySpider.HISTORY_FILE);
-		if (!file.exists()) {
-			return historyPrices;
-		}
-		RandomAccessFile raf = null;
-		try {
-			raf = new RandomAccessFile(file, "r");
-			String str;
-			raf.readLine();
-			while ((str = raf.readLine()) != null) {
-				String[] split = str.split(",");
 
-				String date = split[0];
-				String priceStr = split[2];
-				String volsStr = split[7];
-
-				if (split != null) {
-					historyPrices.addFirst(new HistoryPrice(date, Float.valueOf(priceStr), Long.valueOf(volsStr)));
-				}
-			}
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			if (raf != null) {
-				try {
-					raf.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-		return historyPrices;
-	}
 }

@@ -1,8 +1,5 @@
 package zhibiao.base.dmi;
 
-import stock.dzh.Recorder;
-import stock.sohu.HistorySpider;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -20,56 +17,6 @@ public class DMI {
 	private static final int DAY_6 = 6;
 	private static final int DAY_14 = 14;
 	private static String field = "日期,上升指标(+DI),下降指标(-DI),动向平均数(ADX),评估数值(ADXR),真是波幅(TR),上升动向值(+DI),下降动向值(-DI)";
-
-	public static void main(String[] args) {
-		DMI dmi = new DMI();
-		for (String stockName : Recorder.stockList) {
-			System.out.println(stockName);
-			Deque<HistoryPrice> prices = dmi.getPriceInfo(stockName);
-			Deque<DmiData> dmiDatas = dmi.computeDMI(prices);
-			dmi.recorder(dmiDatas, stockName);
-		}
-	}
-
-	public void recorder(Deque<DmiData> dmiDatas, String stockName) {
-		String path = RECORD_PATH + stockName + File.separator;
-		File file = new File(path + "dmi.csv");
-		if (!file.exists()) {
-			try {
-				file.createNewFile();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		RandomAccessFile raf = null;
-		try {
-			raf = new RandomAccessFile(file, "rw");
-			long length = raf.length();
-			if (length == 0) {
-				raf.write(field.getBytes(Recorder.charset));
-				raf.writeByte((byte) 0XA);
-			} else {
-				raf.skipBytes((int) length);
-			}
-			for (DmiData bias : dmiDatas) {
-				raf.write(bias.toString().getBytes());
-				raf.writeByte((byte) 0XA);
-			}
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			if (raf != null) {
-				try {
-					raf.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-
-	}
 
 	public Deque<DmiData> computeDMI(Deque<HistoryPrice> prices) {
 		Deque<DmiData> dmiDatas = new ArrayDeque<DmiData>();
@@ -211,43 +158,5 @@ public class DMI {
 		return tr;
 	}
 
-	public Deque<HistoryPrice> getPriceInfo(String stockName) {
-		Deque<HistoryPrice> historyPrices = new ArrayDeque<HistoryPrice>();
-		String path = Recorder.BASE_PATH + stockName + File.separator;
-		File file = new File(path + HistorySpider.HISTORY_FILE);
-		if (!file.exists()) {
-			return historyPrices;
-		}
-		RandomAccessFile raf = null;
-		try {
-			raf = new RandomAccessFile(file, "r");
-			String str = null;
-			raf.readLine();
-			while ((str = raf.readLine()) != null) {
-				String[] split = str.split(",");
 
-				String date = split[0];
-				String priceStr = split[2];
-				String minStr = split[5];
-				String maxStr = split[6];
-
-				if (split != null) {
-					historyPrices.addFirst(new HistoryPrice(date, Float.valueOf(priceStr), Float.valueOf(maxStr), Float.valueOf(minStr)));
-				}
-			}
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			if (raf != null) {
-				try {
-					raf.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-		return historyPrices;
-	}
 }

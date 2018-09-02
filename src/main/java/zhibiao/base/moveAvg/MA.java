@@ -1,8 +1,5 @@
 package zhibiao.base.moveAvg;
 
-import stock.dzh.Recorder;
-import stock.sohu.HistorySpider;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -26,45 +23,7 @@ public class MA {
 		field += (maCycle + "日均线值");
 	}
 
-	public void recorder(Deque<MaData> mas, String stockName) {
-		String path = RECORD_PATH + stockName + File.separator;
-		File file = new File(path + "ma_" + maCycle + ".csv");
-		if (!file.exists()) {
-			try {
-				file.createNewFile();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		RandomAccessFile raf = null;
-		try {
-			raf = new RandomAccessFile(file, "rw");
-			long length = raf.length();
-			if (length == 0) {
-				raf.write(field.getBytes(Recorder.charset));
-				raf.writeByte((byte) 0XA);
-			} else {
-				raf.skipBytes((int) length);
-			}
-			for (MaData ma : mas) {
-				raf.write(ma.toString().getBytes());
-				raf.writeByte((byte) 0XA);
-			}
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			if (raf != null) {
-				try {
-					raf.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
 
-	}
 
 	public Deque<MaData> computeMA(Deque<HistoryPrice> prices) {
 		Deque<Float> maPrice = new ArrayDeque<Float>();
@@ -96,41 +55,4 @@ public class MA {
 		return mas;
 	}
 
-	public Deque<HistoryPrice> getPriceInfo(String stockName) {
-		Deque<HistoryPrice> historyPrices = new ArrayDeque<HistoryPrice>();
-		String path = Recorder.BASE_PATH + stockName + File.separator;
-		File file = new File(path + HistorySpider.HISTORY_FILE);
-		if (!file.exists()) {
-			return historyPrices;
-		}
-		RandomAccessFile raf = null;
-		try {
-			raf = new RandomAccessFile(file, "r");
-			String str = null;
-			raf.readLine();
-			while ((str = raf.readLine()) != null) {
-				String[] split = str.split(",");
-
-				String date = split[0];
-				String priceStr = split[2];
-
-				if (split != null) {
-					historyPrices.addFirst(new HistoryPrice(date, Float.valueOf(priceStr)));
-				}
-			}
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			if (raf != null) {
-				try {
-					raf.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-		return historyPrices;
-	}
 }

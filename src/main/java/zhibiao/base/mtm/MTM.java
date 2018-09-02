@@ -1,8 +1,5 @@
 package zhibiao.base.mtm;
 
-import stock.dzh.Recorder;
-import stock.sohu.HistorySpider;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -21,54 +18,6 @@ public class MTM {
 	private static final int DAY_12_CYCLE = 12;
 	private static final int DAY_6_CYCLE = 6;
 
-	public static void main(String[] args) {
-		MTM MTM = new MTM();
-		for (String stockName : Recorder.stockList) {
-			System.out.println(stockName);
-			Deque<HistoryPrice> prices = MTM.getPriceInfo(stockName);
-			Deque<MTMData> mtmDatas = MTM.computeMTM(prices);
-			MTM.recorder(mtmDatas, stockName);
-		}
-	}
-
-	public void recorder(Deque<MTMData> wrDatas, String stockName) {
-		String path = RECORD_PATH + stockName + File.separator;
-		File file = new File(path + "mtm.csv");
-		if (!file.exists()) {
-			try {
-				file.createNewFile();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		RandomAccessFile raf = null;
-		try {
-			raf = new RandomAccessFile(file, "rw");
-			long length = raf.length();
-			if (length == 0) {
-				raf.write(FIELD.getBytes(Recorder.charset));
-				raf.writeByte((byte) 0XA);
-			} else {
-				raf.skipBytes((int) length);
-			}
-			for (MTMData wr : wrDatas) {
-				raf.write(wr.toString().getBytes());
-				raf.writeByte((byte) 0XA);
-			}
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			if (raf != null) {
-				try {
-					raf.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-	}
 
 	public Deque<MTMData> computeMTM(Deque<HistoryPrice> prices) {
 		Deque<Float> mtmList = new ArrayDeque<Float>();
@@ -112,41 +61,5 @@ public class MTM {
 		return mtms;
 	}
 
-	public Deque<HistoryPrice> getPriceInfo(String stockName) {
-		Deque<HistoryPrice> historyPrices = new ArrayDeque<HistoryPrice>();
-		String path = Recorder.BASE_PATH + stockName + File.separator;
-		File file = new File(path + HistorySpider.HISTORY_FILE);
-		if (!file.exists()) {
-			return historyPrices;
-		}
-		RandomAccessFile raf = null;
-		try {
-			raf = new RandomAccessFile(file, "r");
-			String str = null;
-			raf.readLine();
-			while ((str = raf.readLine()) != null) {
-				String[] split = str.split(",");
 
-				String date = split[0];
-				String priceStr = split[2];
-
-				if (split != null) {
-					historyPrices.addFirst(new HistoryPrice(date, Float.valueOf(priceStr)));
-				}
-			}
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			if (raf != null) {
-				try {
-					raf.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-		return historyPrices;
-	}
 }

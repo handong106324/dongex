@@ -1,6 +1,8 @@
 package zhibiao.base.kdj;
 
 
+import zhibiao.base.MACD.HistoryPrice;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -133,95 +135,5 @@ public class KDJ {
 		return kdjs;
 	}
 
-	public Deque<HistoryPrice> getLastInfo(String stockCodeName) {
-		Deque<HistoryPrice> historyPrices = new ArrayDeque<HistoryPrice>();
-		String path = BASE_DATA_PATH + stockCodeName + File.separator;
-		File file = new File(path + HistorySpider.HISTORY_FILE);
-		if (!file.exists()) {
-			return historyPrices;
-		}
-		RandomAccessFile raf = null;
-		try {
-			raf = new RandomAccessFile(file, "r");
-			String str = null;
-			raf.readLine();
-			while ((str = raf.readLine()) != null) {
-				String[] split = str.split(",");
-
-				if (split != null) {
-					HistoryPrice hPrice = new HistoryPrice();
-					hPrice.setDate(split[0]);
-					hPrice.setPrice(split[2]);
-					hPrice.setMinPrice(split[5]);
-					hPrice.setMaxPrice(split[6]);
-					hPrice.setStock(stockCodeName);
-
-					historyPrices.addFirst(hPrice);
-				}
-			}
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			if (raf != null) {
-				try {
-					raf.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-		return historyPrices;
-	}
-
-	public void recorder(Deque<KdjData> kdjDatas, String stockCodeName) {
-		String path = RECORD_PATH + stockCodeName + File.separator;
-		File file = new File(path + "kdj.csv");
-		if (!file.exists()) {
-			try {
-				file.createNewFile();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		RandomAccessFile raf = null;
-		try {
-			raf = new RandomAccessFile(file, "rw");
-			long length = raf.length();
-			if (length == 0) {
-				raf.write(field.getBytes(Recorder.charset));
-				raf.writeByte((byte) 0XA);
-			} else {
-				raf.skipBytes((int) length);
-			}
-			for (KdjData kdjData : kdjDatas) {
-				raf.write(kdjData.toString().getBytes());
-				raf.writeByte((byte) 0XA);
-			}
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			if (raf != null) {
-				try {
-					raf.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-	}
-
-	public static void main(String[] args) {
-		KDJ kdj = new KDJ();
-		for (String stockCodeName : Recorder.stockList) {
-			System.out.println(stockCodeName);
-			Deque<HistoryPrice> lastPrices = kdj.getLastInfo(stockCodeName);
-			Deque<KdjData> kdjDatas = kdj.computeStockKDJ(lastPrices);
-			kdj.recorder(kdjDatas, stockCodeName);
-		}
-	}
 
 }
