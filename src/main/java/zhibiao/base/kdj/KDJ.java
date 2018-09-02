@@ -3,10 +3,6 @@ package zhibiao.base.kdj;
 
 import zhibiao.base.MACD.HistoryPrice;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.math.BigDecimal;
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -23,10 +19,6 @@ public class KDJ {
 
 	private float minPrice = Integer.MAX_VALUE;
 	private float maxPrice = Integer.MIN_VALUE;
-
-	private static final String RECORD_PATH = "/Users/Luonanqin/stock/data/";
-	private static final String BASE_DATA_PATH = "/Users/Luonanqin/stock/data/";
-	private static final String field = "日期,K,D,J,lastK,lastD";
 
 	private Deque<Float> nineDayMin = new ArrayDeque<Float>(9);
 	private Deque<Float> nineDayMax = new ArrayDeque<Float>(9);
@@ -99,14 +91,30 @@ public class KDJ {
 
 				first = false;
 			} else {
+
+				/**
+				 * n日RSV=（Cn－Ln）/（Hn－Ln）×100
+				 公式中，Cn为第n日收盘价；Ln为n日内的最低价；Hn为n日内的最高价。
+				 其次，计算K值与D值：
+				 当日K值=2/3×前一日K值+1/3×当日RSV
+				 当日D值=2/3×前一日D值+1/3×当日K值
+				 若无前一日K 值与D值，则可分别用50来代替。
+				 J值=3*当日K值-2*当日D值
+				 以9日为周期的KD线为例，即未成熟随机值，计算公式为
+				 9日RSV=（C－L9）÷（H9－L9）×100
+				 公式中，C为第9日的收盘价；L9为9日内的最低价；H9为9日内的最高价。
+				 K值=2/3×第8日K值+1/3×第9日RSV
+				 D值=2/3×第8日D值+1/3×第9日K值
+				 J值=3*第9日K值-2*第9日D值
+				 若无前一日K
+				 值与D值，则可以分别用50代替
+				 */
+
 				RSV = (price - minPrice) / (maxPrice - minPrice) * 100;
 				float k = 2 * lastK / 3 + 1 * RSV / 3;
 				float d = 2 * lastD / 3 + 1 * k / 3;
 				float j = 3 * k - 2 * d;
 
-//				System.out.println(RSV);
-//				System.out.println(lastK);
-//				System.out.println(lastD);
 				lastK = k;
 				lastD = d;
 

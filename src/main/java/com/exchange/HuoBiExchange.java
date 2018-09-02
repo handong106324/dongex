@@ -6,6 +6,7 @@ import com.dong.invest.model.ex.bigone.BigOneOrder;
 import com.dong.invest.model.ex.bigone.BigOneTicker;
 import com.dong.invest.model.pairs.SymbolPair;
 import com.huobi.api.ApiClient;
+import com.huobi.response.Kline;
 import com.huobi.response.Symbol;
 import d.trade.duichong.CurrentMarketInfo;
 import d.trade.duichong.TradeResult;
@@ -79,5 +80,10 @@ public class HuoBiExchange extends Exchange {
 
     }
 
+    public List<Kline> klines(SymbolPair symbolPair,String period,String size) {
+        String resp = apiClient.kline(symbolPair.getMarketId(),period,size);
+        System.out.println(resp);
+        return null;
+    }
 
 }

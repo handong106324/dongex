@@ -29,11 +29,11 @@ public class Main {
         ApiClient client = new ApiClient(API_KEY, API_SECRET);
         // get symbol list:
         print(client.getSymbols());
-
-        //获取 K 线
-        //------------------------------------------------------ kline -------------------------------------------------------
-        KlineResponse kline = client.kline("btcusdt", "5min", "100");
-        print(kline);
+//
+//        //获取 K 线
+//        //------------------------------------------------------ kline -------------------------------------------------------
+//        KlineResponse kline = client.kline("btcusdt", "5min", "100");
+//        print(kline);
 
         //------------------------------------------------------ merged -------------------------------------------------------
 
