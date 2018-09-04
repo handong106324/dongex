@@ -7,6 +7,7 @@ import com.dong.invest.model.Exchange;
 import com.dong.invest.model.ex.bigone.BigOneOrder;
 import com.dong.invest.model.ex.bigone.BigOneTicker;
 import com.dong.invest.model.pairs.SymbolPair;
+import com.huobi.response.Kline;
 import com.huobi.response.Symbol;
 import com.okcoin.rest.StockClient;
 import com.okcoin.rest.stock.IStockRestApi;
@@ -87,5 +88,9 @@ public class OkExchange extends Exchange {
         }
 
         return null;
+    }
+
+    public List<Kline> klines(SymbolPair symbolPair, String s, String s1,String since) {
+        return StockClient.klines(symbolPair.getMarketId(), s,s1,since);
     }
 }

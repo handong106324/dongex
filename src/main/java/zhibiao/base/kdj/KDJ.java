@@ -1,12 +1,12 @@
 package zhibiao.base.kdj;
 
 
+import com.google.api.client.util.DataUtil;
 import com.huobi.response.Kline;
+import org.apache.http.client.utils.DateUtils;
 
 import java.math.BigDecimal;
-import java.util.ArrayDeque;
-import java.util.Deque;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by Luonanqin on 4/19/15.
@@ -24,8 +24,8 @@ public class KDJ {
 	private Deque<Double> nineDayMin = new ArrayDeque<Double>(9);
 	private Deque<Double> nineDayMax = new ArrayDeque<Double>(9);
 
-	public Deque<KdjData> computeStockKDJ(List<Kline> historyPrices) {
-		Deque<KdjData> kdjs = new ArrayDeque<KdjData>();
+	public List<KdjData> computeStockKDJ(List<Kline> historyPrices) {
+		List<KdjData> kdjs = new ArrayList<>();
 		boolean first = true;
 		for (Kline hPrice : historyPrices) {
 			double price = hPrice.getClose();
@@ -137,7 +137,8 @@ public class KDJ {
 				}
 			}
 
-			kdjs.addFirst(kdj);
+			kdj.setDate(DateUtils.formatDate(new Date(hPrice.getTimestamp()), "yyyy-MM-dd HH:mm:ss"));
+			kdjs.add(kdj);
 		}
 		return kdjs;
 	}
