@@ -75,6 +75,7 @@ public class Kline {
     private double high;
     private double vol;
 
+    private long timestamp;
     public int getId() {
         return id;
     }
@@ -83,4 +84,11 @@ public class Kline {
         this.id = id;
     }
 
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
+    }
 }

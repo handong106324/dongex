@@ -60,7 +60,15 @@ public class KdjData {
 		this.lastD = lastD;
 	}
 
+	@Override
 	public String toString() {
-		return date + "," + k + "," + d + "," + j + "," + lastK + "," + lastD;
+		return "KdjData{" +
+				"date='" + date + '\'' +
+				", k='" + k + '\'' +
+				", d='" + d + '\'' +
+				", j='" + j + '\'' +
+				", lastK='" + lastK + '\'' +
+				", lastD='" + lastD + '\'' +
+				'}';
 	}
 }
