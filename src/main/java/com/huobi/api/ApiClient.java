@@ -146,13 +146,21 @@ public class ApiClient {
      * @param size
      * @return
      */
-    public KlineResponse kline(String symbol, String period, String size) {
+//    public KlineResponse kline(String symbol, String period, String size) {
+//        HashMap map = new HashMap();
+//        map.put("symbol", symbol);
+//        map.put("period", period);
+//        map.put("size", size);
+//        KlineResponse resp = get("/market/history/kline", map, new TypeReference<KlineResponse<List<Kline>>>() {
+//        });
+//        return resp;
+//    }
+    public String kline(String symbol, String period, String size) {
         HashMap map = new HashMap();
         map.put("symbol", symbol);
         map.put("period", period);
         map.put("size", size);
-        KlineResponse resp = get("/market/history/kline", map, new TypeReference<KlineResponse<List<Kline>>>() {
-        });
+        String resp = HttpUtil.doGet(ExchangeUrlUtils.HB_API_URL+"/market/history/kline", map);
         return resp;
     }
 
