@@ -7,6 +7,8 @@ import java.util.List;
 import com.ApiFactory;
 import com.ApiKey;
 
+import com.huobi.response.Kline;
+import com.utils.ExchangeUrlUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpException;
 
@@ -145,5 +147,28 @@ public class StockClient {
 			}
 		
 		return list;
+	}
+
+	public static List<Kline> klines(String marketId, String period, String size,String since) {
+		String reps = HttpUtil.doGet(url_prex +"api/v1/kline.do?symbol="+marketId+"&type="+period+"&size="+size+"&since="+since);
+		System.out.println(reps);
+		String[] res = StringUtils.split(reps, "[\\[|\\]]");
+		List<Kline> klines = new ArrayList<>();
+
+		for (String data : res) {
+			String[] str = StringUtils.split(data, "[\\,|\"]");
+			if (str.length != 6) {
+				continue;
+			}
+			Kline kline = new Kline();
+			kline.setOpen(Double.parseDouble(str[1]));
+			kline.setHigh(Double.parseDouble(str[2]));
+			kline.setLow(Double.parseDouble(str[3]));
+			kline.setClose(Double.parseDouble(str[4]));
+			kline.setVol(Double.parseDouble(str[5]));
+			kline.setTimestamp(Long.parseLong(str[0]));
+			klines.add(kline);
+		}
+		return klines;
 	}
 }
