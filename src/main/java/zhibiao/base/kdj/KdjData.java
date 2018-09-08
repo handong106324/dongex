@@ -9,8 +9,6 @@ public class KdjData {
 	private String k;
 	private String d;
 	private String j;
-	private String lastK;
-	private String lastD;
 
 	public String getDate() {
 		return date;
@@ -44,21 +42,6 @@ public class KdjData {
 		this.j = j;
 	}
 
-	public String getLastK() {
-		return lastK;
-	}
-
-	public void setLastK(String lastK) {
-		this.lastK = lastK;
-	}
-
-	public String getLastD() {
-		return lastD;
-	}
-
-	public void setLastD(String lastD) {
-		this.lastD = lastD;
-	}
 
 	@Override
 	public String toString() {
@@ -67,8 +50,6 @@ public class KdjData {
 				", k='" + k + '\'' +
 				", d='" + d + '\'' +
 				", j='" + j + '\'' +
-				", lastK='" + lastK + '\'' +
-				", lastD='" + lastD + '\'' +
 				'}';
 	}
 }

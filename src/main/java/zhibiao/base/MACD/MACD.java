@@ -1,15 +1,11 @@
 package zhibiao.base.MACD;
 
 
-import zhibiao.dzh.Recorder;
+import com.huobi.response.Kline;
+import org.apache.commons.lang.time.DateFormatUtils;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.math.BigDecimal;
-import java.util.ArrayDeque;
-import java.util.Deque;
+import java.util.*;
 
 /**
  * Created by Luonanqin on 4/19/15.
@@ -24,16 +20,13 @@ public class MACD {
 
 	private double MACD = 0;
 
-	private static final String RECORD_PATH = "/Users/Luonanqin/stock/data/";
-	private static final String BASE_DATA_PATH = "/Users/Luonanqin/stock/data/";
-	private static final String field = "日期,macd,DIFF,DEA,EMA12,EMA26";
 
-	public Deque<MacdData> computeStockMACD(Deque<HistoryPrice> historyPrices) {
-		Deque<MacdData> macds = new ArrayDeque<MacdData>();
+	public List<MacdData> computeStockMACD(List<Kline> historyPrices) {
+		List<MacdData> macds = new ArrayList<>();
 		boolean first = true;
-		for (HistoryPrice hPrice : historyPrices) {
-			String date = hPrice.getDate();
-			double price = Double.valueOf(hPrice.getPrice());
+		for (Kline hPrice : historyPrices) {
+			String date = DateFormatUtils.format(new Date(hPrice.getTimestamp()), "yyyy-MM-dd HH:mm:ss");
+			double price = Double.valueOf(hPrice.getClose());
 
 			MacdData macdData = new MacdData();
 			macdData.setDate(date);
@@ -51,8 +44,6 @@ public class MACD {
 				DEA = DEA * 8 / 10 + DIFF * 2 / 10;
 				MACD = 2 * (DIFF - DEA);
 
-				macdData.setEma12(EMA12);
-				macdData.setEma26(EMA26);
 
 				BigDecimal DIFF_B = new BigDecimal(DIFF);
 				if (DIFF > 1) {
@@ -77,49 +68,9 @@ public class MACD {
 				macdData.setMacd(MACD_B.toString());
 			}
 
-			macds.addFirst(macdData);
+			macds.add(macdData);
 		}
 		return macds;
-	}
-
-
-	public void recorder(Deque<MacdData> macds, String stockCodeName) {
-		String path = RECORD_PATH + stockCodeName + File.separator;
-		File file = new File(path + "macd.csv");
-		if (!file.exists()) {
-			try {
-				file.createNewFile();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		RandomAccessFile raf = null;
-		try {
-			raf = new RandomAccessFile(file, "rw");
-			long length = raf.length();
-			if (length == 0) {
-				raf.write(field.getBytes(Recorder.charset));
-				raf.writeByte((byte) 0XA);
-			} else {
-				raf.skipBytes((int) length);
-			}
-			for (MacdData macd : macds) {
-				raf.write(macd.toString().getBytes());
-				raf.writeByte((byte) 0XA);
-			}
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			if (raf != null) {
-				try {
-					raf.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
 	}
 
 }

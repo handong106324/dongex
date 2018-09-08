@@ -32,7 +32,7 @@ import utils.HttpUtil;
 public class StockClient {
 	static ApiKey apiKey = ApiFactory.getKey("OK");
 
-    static String url_prex = "https://www.okex.com/";  //注意：请求URL 国际站https://www.okcoin.com ; 国内站https://www.okcoin.cn
+    static String url_prex = "https://www.okcoin.com/";  //注意：请求URL 国际站https://www.okcoin.com ; 国内站https://www.okcoin.cn
 
     /**
      * get请求无需发送身份认证,通常用于获取行情，市场深度等公共信息
